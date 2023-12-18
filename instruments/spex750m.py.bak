@@ -60,10 +60,9 @@ API documentation
 +++++++++++++++++
 
 """
-from __future__ import print_function
 
 from time import sleep
-from triax320_control.util import Serial, InstrumentError
+from wanglib.util import Serial, InstrumentError
 
 class spex750m(object):
     """
@@ -93,7 +92,7 @@ class spex750m(object):
         try:
             self.init_hardware()    # try to initialize hardware.
         except InstrumentError as err:
-            print("%s, rebooting once..." % err)
+            print "%s, rebooting once..." % err
             self.reboot()           # in case of trouble, reboot
             self.init_hardware()    # and try again.
 
@@ -105,27 +104,24 @@ class spex750m(object):
         return 'Spex 750M'
 
     def boot_status_check(self):
-        """
-        Check the boot status of the controller.
+        """Check the boot status of the controller.
 
-        - * : Just Autobauded
+        - \* : Just Autobauded
         - B : Boot Acknowledged
         - F : Just Flashed
         """
         self.bus.readall()
-        resp = self.bus.ask(b' ')    # send autobaud character
+        resp = self.bus.ask(' ')    # send autobaud character
         if len(resp) == 0:
             raise InstrumentError("750M did not give a boot status")
-        # elif resp[0] in (b'*', b'F', b'B'):
-        #    return resp[0]
-        elif resp == b'F' or resp == b'*' or resp == b'B':
-            return resp
+        elif resp[0] in ("*", "F", "B"):
+            return resp[0]
         else:
             raise InstrumentError("Unknown 750M boot status: %s" % resp)
 
     def reboot(self):
         """Reboot the controller if it's not responding"""
-        return self.bus.ask(b'\xDE')
+        return self.bus.ask("\xDE")
 
     def _hi_iq(self):
         """Send the HI IQ character to the controller.
@@ -134,8 +130,8 @@ class spex750m(object):
         afterward.
         """
         self.bus.readall()
-        resp = self.bus.ask(b'\xF7')
-        if resp == b'=':
+        resp = self.bus.ask("\xF7")
+        if resp[0] == "=":
             return True
         else:
             raise InstrumentError("750M HI IQ command failed")
@@ -144,18 +140,18 @@ class spex750m(object):
         """Flash the controller by sending the O2000<null>
         string to it.
         """
-        return self.bus.ask(b'O2000\x00')
+        return self.bus.ask("O2000\x00")
 
     def init_hardware(self):
         """Initialize 750M hardware. I don't know why this
         works, I just copied Yan's LabView routine.
         """
         status = self.boot_status_check()
-        if status == b'*':
+        if status == "*":
             self._hi_iq()    # * -> B
             self._flash()    # B -> F
         status = self.boot_status_check()
-        if status == b'F':
+        if status == "F":
             return True
         else:
             raise InstrumentError("750M hardware init failed.")
@@ -175,7 +171,7 @@ class spex750m(object):
             sleep(0.050)
         # read the status byte when it arrives
         resp = self.bus.read()
-        if resp != b'o':
+        if resp != 'o':
             raise InstrumentError("750M operation failed: %s" % resp)
 
     def calibrate(self, wl_value):
@@ -185,15 +181,15 @@ class spex750m(object):
         """
         self.bus.readall()
         cmd = "G0,%d\r" % (wl_value * self._steps_per_nm)
-        self.bus.write(cmd.encode('utf-8'))
+        self.bus.write(cmd)
         self.wait_for_ok()
 
-    _busyCodes = {b'q': True,
-                 b'z': False }
+    _busyCodes = {"q": True,
+                 "z": False }
 
     def is_busy(self):
         """Check if the motors are busy. """
-        self.bus.write(b'E')
+        self.bus.write("E")
         self.wait_for_ok()
         resp = self.bus.readall()
         return self._busyCodes[resp]
@@ -203,7 +199,7 @@ class spex750m(object):
         number of nanometers."""
         self.bus.readall()
         cmd = "F0,%d\r" % (distance_to_move * self._steps_per_nm)
-        self.bus.write(cmd.encode('utf-8'))
+        self.bus.write(cmd)
         self.wait_for_ok()
         while self.is_busy():
             # wait for the motors to rest
@@ -212,9 +208,9 @@ class spex750m(object):
     def get_wavelength(self):
         """Query the current wavelength """
         self.bus.readall()
-        self.bus.write(b'HO\r')
+        self.bus.write("HO\r")
         self.wait_for_ok()
-        resp = self.bus.readall(term_chars=b'\r')
+        resp = self.bus.readall(term_chars='\r')
         # convert to wavelength units
         wl = int(resp) / float(self._steps_per_nm)
         return wl
@@ -260,8 +256,7 @@ class triax320(spex750m):
 
     # different default location.
     # hopefully the __init__ function will pick this up.
-    #_default_location = '/dev/ttyUSB1'
-    _default_location = '/dev/tty.usbserial-140'
+    _default_location = '/dev/ttyUSB1'
 
     def __str__(self):
         return 'Triax 320'
@@ -275,14 +270,13 @@ class triax320(spex750m):
     def calibrate(self, wl):
         """Set wavelength of Triax without moving motor """
         self.bus.readall()
-        to_write = "Z60,1,"+str(wl)+"\r"
-        self.bus.write(to_write.encode('utf-8'))
+        self.bus.write("Z60,1,"+str(wl)+"\r")
         self.wait_for_ok()
 
     def get_wavelength(self):
         """Query the current wavelength """
         self.bus.readall()
-        self.bus.write(b'Z62,1\r')
+        self.bus.write("Z62,1\r")
         self.wait_for_ok(expected_bytes=8)
         resp = self.bus.readall()
         return float(resp)
@@ -290,8 +284,7 @@ class triax320(spex750m):
     def set_wavelength(self, wl):
         """Move to a new wavelength """
         self.bus.readall()
-        to_write = "Z61,1," + str(wl)+"\r"
-        self.bus.write(to_write.encode('utf-8'))
+        self.bus.write("Z61,1,"+str(wl)+"\r")
         self.wait_for_ok()
         while self.is_busy():
             # wait for the motors to rest
@@ -317,7 +310,7 @@ class triax320(spex750m):
 
         """
         self.bus.readall()
-        self.bus.write(b'k0,%d,%d\r' % (slit_number, amount))
+        self.bus.write("k0,%d,%d\r" % (slit_number, amount))
         self.wait_for_ok()
         while self.is_busy():
             # wait for the motors to rest
@@ -334,7 +327,7 @@ class triax320(spex750m):
 
         """
         self.bus.readall()
-        self.bus.write(b'j0,%d\r' % slit_number)
+        self.bus.write("j0,%d\r" % slit_number)
         self.wait_for_ok()
         resp = self.bus.readall()
         return float(resp)
@@ -432,7 +425,7 @@ class triax320(spex750m):
         Don't forget to reopen the slits after calling this.
 
         """
-        self.bus.write(b'A')
+        self.bus.write("A")
         self.wait_for_ok()
         # at this point we could call "i0,0,0\r"
         # and "i0,2,0" to zero the slits

@@ -1,5 +1,4 @@
 """This file provides useful utilities for the wanglib package."""
-from __future__ import print_function
 
 from time import sleep, time, ctime
 from numpy import array
@@ -15,7 +14,6 @@ try:
     import serial
 except ImportError:
     # PySerial is not installed
-    print("no serial installed")
     serial = None
 
 def show_newlines(string):
@@ -24,8 +22,7 @@ def show_newlines(string):
     useful for debugging.
 
     """
-    return string
-    #return bytes.replace(b'\r', b'<CR>').replace(b'\n', b'<LF>')
+    return string.replace('\r', '<CR>').replace('\n', '<LF>')
 
 if serial:
     class Serial(serial.Serial):
@@ -56,14 +53,14 @@ if serial:
 
         def __init__(self, *args, **kwargs):
             # make an event logger
-            self.logger = logging.getLogger('triax320_control.util.Serial')
+            self.logger = logging.getLogger('wanglib.util.Serial')
             # take 'log' kwarg.
             self.logfile = kwargs.pop('log', False)
             if self.logfile:
                 self.start_logging(self.logfile)
             # take default termination character
             # by default, append empty string
-            self.term_chars = kwargs.pop('term_chars', b'')
+            self.term_chars = kwargs.pop('term_chars', '')
             # hand off to standard serial init function
             super(Serial, self).__init__(*args, **kwargs)
 
@@ -80,16 +77,13 @@ if serial:
             self.logger.debug('opened serial port')
 
         def write(self, data):
-            #data += self.term_chars
+            data += self.term_chars
             super(Serial, self).write(data)
-            super(Serial, self).write(self.term_chars)
-            #write_txt = 'write: ' + data.decode('utf-8')
-            #self.logger.debug(write_txt)
+            self.logger.debug('write: ' + show_newlines(data))
 
         def read(self, size=1):
             resp = super(Serial, self).read(size)
-            #resp_txt = 'read: ' + resp.decode('utf-8')
-            #self.logger.debug(resp_txt)
+            self.logger.debug(' read: ' + show_newlines(resp))
             return resp
 
         def readall(self, term_chars=None):
@@ -102,9 +96,9 @@ if serial:
 
             """
             resp = self.read(self.inWaiting())
-            if term_chars == None:
+            if term_chars is None:
                 term_chars = self.term_chars
-            if term_chars != b'':
+            if term_chars is not '':
                 while resp[-len(term_chars):] != term_chars:
                     resp += self.read(self.inWaiting())
             return resp
@@ -199,7 +193,7 @@ if leastsq is not None:
             if win:
                 self.param = result
             else:
-                print("fail!!")
+                print "fail!!"
 
         def plot(self):
             """ plot the calibration points and the fit"""
@@ -257,7 +251,7 @@ if leastsq is not None:
         if win:
             return pfit
         else:
-            print("fail!")
+            print "fail!"
 
 def gaussian(p, x):
     """
@@ -438,7 +432,7 @@ class saver(object):
         save(fname, array)
         self.n +=1
         if self.verbose:
-            print("saved as", fname)
+            print "saved as", fname
 
 from contextlib import contextmanager
 

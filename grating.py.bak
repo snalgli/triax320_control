@@ -7,7 +7,6 @@ Functions here support use of the Spatial Light Modulator
 for use as a programmable grating, pulse shaper, etc.
 
 """
-from __future__ import print_function
 
 import numpy
 import Image
@@ -235,7 +234,7 @@ class pattern(object):
             try:
                 self.proxy.setImageData(data)
             except xmlrpclib.ProtocolError:
-                print('error talking to display server, retrying once')
+                print 'error talking to display server, retrying once'
                 self.proxy.setImageData(data)
         elif throw:
             raise InstrumentError("No display server defined")

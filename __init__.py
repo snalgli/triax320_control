@@ -26,3 +26,4 @@ best to install the package and its dependencies.
 # rather than being specific to any given experimental setup.
 
 from . import instruments as instruments
+from .instruments.spex750m import triax320 as triax320

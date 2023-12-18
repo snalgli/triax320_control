@@ -91,10 +91,9 @@ tells you where to find the source file for any object on your
 computer.
 
 """
-from __future__ import absolute_import
 
-from .spex750m import spex750m as spex750m
-from .spex750m import triax320 as triax320
-from .lockins import egg5110, srs830
-from .signal_generators import ag8648
+from spex750m import spex750m as spex750m
+from spex750m import triax320 as triax320
+from lockins import egg5110, srs830
+from signal_generators import ag8648
 

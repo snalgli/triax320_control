@@ -25,7 +25,7 @@ corresponding classes.
 
 """
 
-from wanglib.util import InstrumentError, sciround
+from triax320_control.util import InstrumentError, sciround
 
 class srs830(object):
     """ A Stanford Research Systems model SR830 DSP lock-in.
