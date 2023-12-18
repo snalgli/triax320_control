@@ -3,24 +3,28 @@
 Hopefully soon a Python 3 compatible control software for the Triax320 Monochromator based on wanglib by T. Baldwin (https://github.com/baldwint/wanglib).
 Work in progress
 
-Everything related to controlling the Triax320 is now functional under Python 3. What will happen to the rest is unclear at this point, but there is no intention to work on it for the moment.
+Everything related to controlling the Triax320 is now functional under Python 3. What will happen to the rest is unclear at this point, but there is no intention to work on it for the foreseeable future.
 
-## Doku Triax320 Monochromator
+## Notes
 
 
 using wanglib package. needs python 2, doesnt work on python3!
 installing python 2 using a virtual environment, for example anaconda or pyenv
 
-anaconda:
-    conda create --name py2 python=2.7.18
-    conda activate py2
+__anaconda:__  
+    conda create --name py2 python=2.7.18  
+    conda activate py2  
     
     
-check for used serial port:
-    mac: ls /dev/tty.usb*
-    linux: usually /dev/ttyUSB0 or /dev/ttyUSB1
+__check for used serial port:__
+    mac: ls /dev/tty.usb*  
+    linux: usually /dev/ttyUSB0 or /dev/ttyUSB1  
+    win: should be COM1 or with different number
     
-important: stepsize has to be correct in spex750m.py line 100 (16.7 for triax320 without microstep option, 500 with option, 4000 for spex750m)
+> [!CAUTION]
+> Stepsize has to be correct in spex750m.py line 100 (16.7 for triax320 without microstep option, 500 with option, 4000 for spex750m)
+> If it's too high it might damage the motor!
+
 
 ## Quick Start Guide:
 1. Prerequisites
