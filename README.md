@@ -31,8 +31,12 @@ important: stepsize has to be correct in spex750m.py line 100 (16.7 for triax320
    from triax320_control.instruments.spex750m import triax320 as triax320
    ```
 4. Initialize Instance
+   ```python
    beast = triax320()
-5. Calibrate Motors. It is best to reset all motors at the beginning and zero the wavelength.
+   ```
+6. Calibrate Motors. It is best to reset all motors at the beginning and zero the wavelength.
+   ```python
    beast.motor_init() #this zeroes the slits and the grating
    beast.calibrate(0) # this sets the current wavelength to 0 without moving the motor
-6. Now you are free to have fun with the Monochromator. Useful commands include set_wl(), rel_move() and slits. For a detailed documentation of all commands, see         https://wanglib.readthedocs.io/en/latest/instruments/spex750m.html
+   ```
+8. Now you are free to have fun with the Monochromator. Useful commands include set_wl(), rel_move() and slits. For a detailed documentation of all commands, see         https://wanglib.readthedocs.io/en/latest/instruments/spex750m.html
